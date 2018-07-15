@@ -65,12 +65,12 @@ class SearchPage extends Component {
     };
 
     render() {
-        const { shelfs, books, onShelfChange } = this.props;
+        const { shelfs, books, onShelfChange, goToPrevious } = this.props;
 
         return (
             <div className="search-books">
                 <div className="search-books-bar">
-                    <Link className="close-search" to="/">
+                    <Link className="close-search" to="/" onClick={goToPrevious}>
                         Close
                     </Link>
                     <div className="search-books-input-wrapper">

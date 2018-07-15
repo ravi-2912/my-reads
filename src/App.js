@@ -15,9 +15,7 @@ class BooksApp extends React.Component {
          */
         showSearchPage: false,
         books: [],
-        shelfs: ['currentlyReading', 'wantToRead', 'read'],
-        query: '',
-        searchedBooks: []
+        shelfs: ['currentlyReading', 'wantToRead', 'read']
     };
 
     onShelfChange = (book, shelf) => {
@@ -34,6 +32,10 @@ class BooksApp extends React.Component {
             .then(books => this.setState({ books }))
             .then(() => (window.booksArr = this.state.books)); //comment later
     }
+
+    goToPrevious = history => {
+        history.push('/');
+    };
 
     render() {
         return (
@@ -70,6 +72,7 @@ class BooksApp extends React.Component {
                             shelfs={this.state.shelfs}
                             books={this.state.books}
                             onShelfChange={this.onShelfChange}
+                            goToPrevious={this.goToPrevious}
                         />
                     )}
                 />
