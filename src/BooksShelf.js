@@ -1,24 +1,29 @@
 import React, { Component } from 'react';
 import Book from './Book';
+import PropTypes from 'prop-types';
+import * as UTIL from './util';
 
 class BooksShelf extends Component {
-    camelToFormattedString = string => {
-        const res = string.replace(/([A-Z])/g, ' $1');
-        return res.charAt(0).toUpperCase() + res.slice(1);
+    static propTypes = {
+        shelf: PropTypes.string.isRequired,
+        books: PropTypes.array.isRequired,
+        shelfs: PropTypes.array.isRequired,
+        onShelfChange: PropTypes.func.isRequired
     };
+
     render() {
-        const { shelf, books } = this.props;
+        const { shelf, books, shelfs, onShelfChange } = this.props;
+
         return (
             <div className="bookshelf">
-                <h2 className="bookshelf-title">{this.camelToFormattedString(shelf)}</h2>
+                <h2 className="bookshelf-title">{UTIL.camelToFormattedString(shelf)}</h2>
                 <div className="bookshelf-books">
                     <ol className="books-grid">
                         {books.map(
                             book =>
                                 book.shelf === shelf && (
                                     <li key={book.id}>
-                                        {book.shelf}
-                                        <Book book={book} />
+                                        <Book book={book} shelfs={shelfs} onShelfChange={onShelfChange} />
                                     </li>
                                 )
                         )}
