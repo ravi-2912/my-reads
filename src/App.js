@@ -17,14 +17,15 @@ class BooksApp extends React.Component {
     };
 
     onShelfChange = (book, shelf) => {
-        BooksAPI.update(book, shelf).then(response => {
-            book.shelf = shelf;
+        if (this.state.shelfs.indexOf(shelf) >= 0)
+            BooksAPI.update(book, shelf).then(response => {
+                book.shelf = shelf;
 
-            var updatedBooks = this.state.books.filter(b => b.id !== book.id);
+                var updatedBooks = this.state.books.filter(b => b.id !== book.id);
 
-            updatedBooks.push(book);
-            this.setState({ books: updatedBooks });
-        });
+                updatedBooks.push(book);
+                this.setState({ books: updatedBooks });
+            });
     };
 
     componentDidMount() {
