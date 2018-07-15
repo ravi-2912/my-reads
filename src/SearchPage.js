@@ -8,37 +8,64 @@ class SearchPage extends Component {
     state = {
         query: '',
         searchedBooks: [],
-        searchErr: true
+        shelvedBooks: []
     };
 
     static propTypes = {
         shelfs: PropTypes.array.isRequired,
+        books: PropTypes.array.isRequired,
         onShelfChange: PropTypes.func.isRequired
     };
 
-    onUpdateQuery = query => {
-        this.setState({ query });
+    onUpdateQuery = (query, shelvedBooks) => {
+        if (!query) {
+            this.setState({ query: '', searchedBooks: [] });
+            return;
+        }
+        this.setState(
+            {
+                query: query,
+                searchedBooks: [],
+                shelvedBooks: shelvedBooks
+            },
+            function() {
+                this.search();
+            }.bind(this)
+        );
+    };
 
-        // if user input => run the search
-        if (query) {
-            BooksAPI.search(query, 20)
-                .then(books => {
-                    books.length > 0
-                        ? this.setState({ searchedBooks: books, searchErr: false })
-                        : this.setState({ searchedBooks: [], searchErr: true });
-                })
-                .then(() => {
-                    window.searchArr = this.state.searchedBooks;
+    search = () => {
+        const app = this;
+        const query = this.state.query;
+        if (query.trim() === '') {
+            this.setState({ query: '', searchedBooks: [] });
+            return;
+        }
+
+        BooksAPI.search(query)
+            .then(books => {
+                if (query !== this.state.query) return;
+
+                if ('error' in books) {
+                    books = [];
+                } else {
+                    books.map(book =>
+                        this.state.shelvedBooks.filter(b => b.id === book.id).map(b => (book.shelf = b.shelf))
+                    );
+                }
+                this.setState({
+                    searchedBooks: books
                 });
-
-            // if query is empty => reset state to default
-        } else this.setState({ searchedBooks: [], searchErr: false });
+            })
+            .catch(function() {
+                app.setState(state => ({
+                    searchedBooks: []
+                }));
+            });
     };
 
     render() {
-        const { shelfs, onShelfChange } = this.props;
-        const query = this.state.query;
-        const books = this.state.searchedBooks;
+        const { shelfs, books, onShelfChange } = this.props;
 
         return (
             <div className="search-books">
@@ -50,21 +77,19 @@ class SearchPage extends Component {
                         <input
                             type="text"
                             placeholder="Search by title or author"
-                            value={query}
-                            onChange={event => this.onUpdateQuery(event.target.value)}
+                            value={this.state.query}
+                            onChange={event => this.onUpdateQuery(event.target.value, books)}
                         />
                     </div>
                 </div>
                 <div className="search-books-results">
-                    {!this.state.searchErr && (
-                        <ol className="books-grid">
-                            {books.map(book => (
-                                <li key={book.id}>
-                                    <Book book={book} shelfs={shelfs} onShelfChange={onShelfChange} />
-                                </li>
-                            ))}
-                        </ol>
-                    )}
+                    <ol className="books-grid">
+                        {this.state.searchedBooks.map(book => (
+                            <li key={book.id}>
+                                <Book book={book} shelfs={shelfs} onShelfChange={onShelfChange} />
+                            </li>
+                        ))}
+                    </ol>
                 </div>
             </div>
         );
