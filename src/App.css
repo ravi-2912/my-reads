@@ -169,10 +169,14 @@ body,
 }
 
 .book-shelf-changer select {
-    width: 100%;
+    width: 120%;
     height: 100%;
     opacity: 0;
     cursor: pointer;
+}
+
+.book-shelf-changer select option:checked {
+    font-weight: bold;
 }
 
 /* book cover */
