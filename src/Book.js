@@ -1,14 +1,22 @@
 import React, { Component } from 'react';
 //import React, { Link } from 'react-dom';
+import PropTypes from 'prop-types';
+import * as UTIL from './util';
 
 class Book extends Component {
+    static propTypes = {
+        book: PropTypes.object.isRequired,
+        shelfs: PropTypes.array.isRequired,
+        onShelfChange: PropTypes.func.isRequired
+    };
+
     render() {
-        const { book } = this.props;
+        const { book, shelfs, onShelfChange } = this.props;
+
         return (
             <div className="book">
                 <div className="book-top">
                     <div
-                        //to={`/${book.key}`}
                         className="book-cover"
                         style={{
                             width: 128,
@@ -17,14 +25,18 @@ class Book extends Component {
                         }}
                     />
                     <div className="book-shelf-changer">
-                        <select>
-                            <option value="move" disabled>
+                        <select onChange={event => onShelfChange(book, event.target.value)} defaultValue={book.shelf}>
+                            <option key="move" value="move" disabled={true}>
                                 Move to...
                             </option>
-                            <option value="currentlyReading">Currently Reading</option>
-                            <option value="wantToRead">Want to Read</option>
-                            <option value="read">Read</option>
-                            <option value="none">None</option>
+                            {shelfs.filter(shelf => shelf !== book.shelf).map(shelf => (
+                                <option key={shelf} value={shelf}>
+                                    {UTIL.camelToFormattedString(shelf)}
+                                </option>
+                            ))}
+                            <option key="close" value="close">
+                                Close
+                            </option>
                         </select>
                     </div>
                 </div>
@@ -34,6 +46,7 @@ class Book extends Component {
                         {author}
                     </div>
                 ))}
+                <div>{book.shelf}</div>
             </div>
         );
     }
